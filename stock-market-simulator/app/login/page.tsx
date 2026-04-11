@@ -2,19 +2,20 @@
 
 
 import { useState } from 'react'
-
+import { useRouter } from 'next/navigation'
 
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-
+    const router = useRouter()
     return (
         <div>
         <form onSubmit={(e) => {
             e.preventDefault();
             console.log(username, password)
+            router.push("/")
         }
 
         }>
