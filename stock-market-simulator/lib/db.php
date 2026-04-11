@@ -1,6 +1,6 @@
 <?php
 // Connect to MySQL server, select database
-    $conn = new mysqli('mysql.eecs.ku.edu', '**your db username**', '**your db password***', '**your database name**');
+    $conn = new mysqli('HOST_HERE', 'USERNAME_HERE', 'PASSWORD_HERE', 'DATABASE_HERE');
     if ($conn -> connect_error)
         die('Could not connect: ' . $conn->connect_error);
     echo 'success';
