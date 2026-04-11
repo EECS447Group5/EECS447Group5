@@ -15,7 +15,7 @@ export default function Login() {
         <form onSubmit={(e) => {
             e.preventDefault();
             console.log(username, password)
-            router.push("/")
+            router.push("/trade")
         }
 
         }>
