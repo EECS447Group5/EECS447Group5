@@ -11,7 +11,7 @@ export default function Login() {
 
     const router = useRouter()
     return (
-        <div>
+
         <form onSubmit={(e) => {
             e.preventDefault();
             console.log(username, password)
@@ -27,7 +27,5 @@ export default function Login() {
             <button type="submit">Log In</button>
         </form>
 
-        
-        </div>
     )
 }
