@@ -1,3 +1,7 @@
 export default function HistoryPage() {
-    return <h1>Trade History</h1>;
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+      <p className="text-gray-600">Your transaction history will appear here.</p>
+    </div>
+  );
 }
