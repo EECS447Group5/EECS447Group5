@@ -22,7 +22,7 @@ export default async function CruisePage() {
       <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
         <h1>Cruise Schedule</h1>
         <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead style={{ backgroundColor: '#f4f4f4' }}>
+          <thead style={{ backgroundColor: '#000000' }}>
             <tr>
               {headers.map((header) => (
                 <th key={header}>{header.toUpperCase()}</th>
