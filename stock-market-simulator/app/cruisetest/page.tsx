@@ -8,18 +8,29 @@ interface Cruise {
   shipnum: string | null;
 }
 
-// 1. New function to test Tiingo
+// 1. Define a type for the multi-stock response
+interface StockData {
+  ticker: string;
+  close: number;
+  last: number; // Some Tiingo endpoints use 'last' instead of 'close'
+  prevClose: number;
+}
+
 async function getTiingoStatus() {
-  const ticker = "aapl";
-  const url = `https://api.tiingo.com/tiingo/daily/${ticker}/prices?token=${process.env.API_KEY}`;
+  // Use a comma-separated list of tickers
+  const tickers = "aapl,msft,googl,amzn,nvda,tsla,meta";
+  const url = `https://api.tiingo.com/tiingo/daily/prices?tickers=${tickers}&token=${process.env.API_KEY}`;
   
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } }); // Cache for 1 hour
+    const res = await fetch(url, { next: { revalidate: 3600 } });
     if (!res.ok) throw new Error(`Tiingo error: ${res.status}`);
-    const data = await res.json();
-    return { success: true, price: data[0].close, ticker: ticker.toUpperCase() };
+    
+    const data: StockData[] = await res.json();
+    
+    // Return the whole array so you can map over it in your UI
+    return { success: true, stocks: data };
   } catch (err) {
-    return { success: false, error: err instanceof Error ? err.message : "Unknown API Error" };
+    return { success: false, error: err instanceof Error ? err.message : "Unknown API Error", stocks: [] };
   }
 }
 
@@ -41,23 +52,28 @@ export default async function CruisePage() {
 
     return (
       <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-        {/* --- TIINGO TEST SECTION --- */}
         <section style={{ 
           marginBottom: '30px', 
           padding: '15px', 
           border: '1px solid #ddd', 
           borderRadius: '8px',
-          backgroundColor: stockStatus.success ? '#f0fff4' : '#fff5f5' 
+          backgroundColor: stockStatus.success ? '#000000' : '#fff5f5' 
         }}>
-          <h2>Tiingo API Test</h2>
+          <h2>Market Watch (Tiingo Multi-Ticker Test)</h2>
+          
           {stockStatus.success ? (
-            <p style={{ color: '#2f855a' }}>
-              <strong>Connected!</strong> Last closing price for <strong>{stockStatus.ticker}</strong>: ${stockStatus.price}
-            </p>
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', gap: '20px' }}>
+              {stockStatus.stocks.map((stock) => (
+                <li key={stock.ticker} style={{ padding: '10px', border: '1px solid #eee', borderRadius: '5px', backgroundColor: '#000000' }}>
+                  <strong>{stock.ticker}</strong>: 
+                  <span style={{ color: '#2f855a', marginLeft: '5px' }}>
+                    ${stock.close || stock.last}
+                  </span>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p style={{ color: '#c53030' }}>
-              <strong>Failed:</strong> {stockStatus.error}
-            </p>
+            <p style={{ color: '#c53030' }}><strong>Failed:</strong> {stockStatus.error}</p>
           )}
         </section>
           <h1>Cruise Schedule</h1>
