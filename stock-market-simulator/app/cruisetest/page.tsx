@@ -1,14 +1,5 @@
 import { sql } from '@/lib/db';
 
-interface Cruise {
-  cruisenum: string;
-  startdate: Date | string | null;
-  enddate: Date | string | null;
-  director: string | null;
-  shipnum: string | null;
-}
-
-// 1. Define a type for the multi-stock response
 interface StockData {
   ticker: string;
   date: string;
@@ -30,7 +21,6 @@ interface StockData {
 
 async function getTiingoStatus() {
   const tickers = "aapl,msft,googl,amzn,nvda,tsla,meta";
-  // Note: Ensure your .env variable matches the name used here (e.g., API_KEY)
   const url = `https://api.tiingo.com/tiingo/daily/prices?tickers=${tickers}&token=${process.env.API_KEY}`;
   
   try {
@@ -38,8 +28,7 @@ async function getTiingoStatus() {
     if (!res.ok) throw new Error(`Tiingo error: ${res.status}`);
     
     const data: StockData[] = await res.json();
-    
-    // Calculate the daily change for each stock
+
     const processedStocks = data.map(stock => {
       const dollarChange = stock.adjClose - stock.open;
       const percentageChange = (dollarChange / stock.open) * 100;
@@ -62,70 +51,52 @@ async function getTiingoStatus() {
   }
 }
 
-export default async function CruisePage() {
+async function updateStocksToDB(stocks: StockData[]) {
   try {
-    // Run both fetches
-    const [rawRows, stockStatus] = await Promise.all([
-      sql`SELECT * FROM CRUISE;`,
-      getTiingoStatus()
-    ]);
-
-    const rows = rawRows as unknown as Cruise[];
-
-    if (!rows || rows.length === 0) {
-      return <p>No data found.</p>;
+    for (const stock of stocks) {
+      await sql`
+        INSERT INTO "Stock" (ticker, company_name, current_price, last_updated)
+        VALUES (${stock.ticker.toUpperCase()}, ${stock.ticker.toUpperCase()}, ${stock.adjClose}, CURRENT_TIMESTAMP)
+        ON CONFLICT (ticker)
+        DO UPDATE SET
+          company_name = EXCLUDED.company_name,
+          current_price = EXCLUDED.current_price,
+          last_updated = EXCLUDED.last_updated;
+      `;
     }
-
-    const headers: string[] = Object.keys(rows[0]);
-
-    return (
-      <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-        <section style={{ marginBottom: '30px', padding: '15px', border: '1px solid #ddd', borderRadius: '8px' }}>
-          <h2>Market Watch</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '15px' }}>
-            {stockStatus.stocks.map((stock: StockData) => (
-              <div key={stock.ticker} style={{ padding: '10px', border: '1px solid #eee' }}>
-                <strong>{stock.ticker.toUpperCase()}</strong>
-                <div>${stock.adjClose.toFixed(2)}</div>
-                <div style={{ color: stock.dailyChange >= 0 ? 'green' : 'red' }}>
-                  {stock.dailyChange >= 0 ? '+' : ''}{stock.dailyChange.toFixed(2)} 
-                  ({stock.dailyChangePercent.toFixed(2)}%)
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-          <h1>Cruise Schedule</h1>
-          <table border={1} cellPadding={10} style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead style={{ backgroundColor: '#000000' }}>
-              <tr>
-                {headers.map((header) => (
-                  <th key={header}>{header.toUpperCase()}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={index}>
-                  {Object.values(row).map((value, idx) => (
-                    <td key={idx}>
-                      {value instanceof Date 
-                        ? value.toLocaleDateString() 
-                        : value?.toString() || "—"}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p style={{ marginTop: '10px', color: '#666' }}>
-            Showing {rows.length} total cruises.
-          </p>
-        </div>
-      );
-  } catch (error) {
-    console.error(error);
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    return <p style={{ color: 'red', padding: '20px' }}>Database Error: {msg}</p>;
+    console.log("Stock data updated in Stock table")
+  } catch (err) {
+    console.error("Error updating Stock table: ", err);
   }
+}
+
+export default async function StockDashboard() {
+  const stockStatus = await getTiingoStatus();
+  if (stockStatus.success) {
+    await updateStocksToDB(stockStatus.stocks);
+  }
+  const dbStocks = await sql`SELECT * FROM "Stock" ORDER BY ticker ASC`;
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Stock Simulator Database</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Ticker</th>
+            <th>Price</th>
+            <th>Last Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          {dbStocks.map((s) => (
+            <tr key={s.stock_id}>
+              <td>{s.ticker}</td>
+              <td>${Number(s.current_price).toFixed(2)}</td>
+              <td>{new Date(s.last_updated).toLocaleTimeString()}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
