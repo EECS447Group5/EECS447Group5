@@ -2,24 +2,23 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/dist/client/link';
 
-export default function Login() {
+export default function Signup() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     const router = useRouter()
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-black">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 text-black">
             <form
                 className="bg-white border border-gray-200 rounded-xl shadow-xl p-8 flex flex-col gap-5 w-80"
                 onSubmit={(e) => {
                     e.preventDefault();
                     console.log(username, password);
-                    router.push("/trade");
+                    router.push("/login");
                 }}
             >
-                <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
+                <h1 className="text-2xl font-bold text-center mb-2">Sign Up</h1>
 
                 <div className="flex flex-col gap-1">
                     <label htmlFor="username" className="text-sm font-medium text-gray-700">
@@ -53,13 +52,9 @@ export default function Login() {
                     type="submit"
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md py-2 mt-2 transition-colors"
                 >
-                    Log In
+                    Sign Up
                 </button>
             </form>
-
-            <p className="mt-4 text-center text-sm text-gray-600">
-                Don't have an account? <Link href="/signup" className="text-blue-600 hover:underline">Sign Up</Link>
-            </p>
         </div>
     )
 }
