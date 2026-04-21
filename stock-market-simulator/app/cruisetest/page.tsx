@@ -55,7 +55,7 @@ async function updateStocksToDB(stocks: StockData[]) {
   try {
     for (const stock of stocks) {
       await sql`
-        INSERT INTO "Stock" (ticker, company_name, current_price, last_updated)
+        INSERT INTO stocks (ticker, company_name, current_price, last_updated)
         VALUES (${stock.ticker.toUpperCase()}, ${stock.ticker.toUpperCase()}, ${stock.adjClose}, CURRENT_TIMESTAMP)
         ON CONFLICT (ticker)
         DO UPDATE SET
@@ -64,9 +64,9 @@ async function updateStocksToDB(stocks: StockData[]) {
           last_updated = EXCLUDED.last_updated;
       `;
     }
-    console.log("Stock data updated in Stock table")
+    console.log("Stock data updated in stocks table")
   } catch (err) {
-    console.error("Error updating Stock table: ", err);
+    console.error("Error updating stocks table: ", err);
   }
 }
 
@@ -75,7 +75,7 @@ export default async function StockDashboard() {
   if (stockStatus.success) {
     await updateStocksToDB(stockStatus.stocks);
   }
-  const dbStocks = await sql`SELECT * FROM "Stock" ORDER BY ticker ASC`;
+  const dbStocks = await sql`SELECT * FROM stocks ORDER BY ticker ASC`;
   return (
     <div style={{ padding: '20px' }}>
       <h1>Stock Simulator Database</h1>
