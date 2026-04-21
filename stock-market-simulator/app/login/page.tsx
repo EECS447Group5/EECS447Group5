@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/dist/client/link';
 
 export default function Login() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const router = useRouter()
@@ -15,22 +15,24 @@ export default function Login() {
                 className="bg-white border border-gray-200 rounded-xl shadow-xl p-8 flex flex-col gap-5 w-80"
                 onSubmit={(e) => {
                     e.preventDefault();
-                    console.log(username, password);
+                    console.log(email, password);
                     router.push("/trade");
                 }}
             >
                 <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
 
                 <div className="flex flex-col gap-1">
-                    <label htmlFor="username" className="text-sm font-medium text-gray-700">
-                        Username
+                    <label htmlFor="email" className="text-sm font-medium text-gray-700">
+                        Email
                     </label>
                     <input
                         type="text"
-                        id="username"
-                        name="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        id="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        placeholder="your@email.com"
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
@@ -45,6 +47,8 @@ export default function Login() {
                         name="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        required
+                        placeholder="Enter your password"
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
