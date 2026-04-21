@@ -15,12 +15,27 @@ interface StockData {
   adjVolume: number;
   divCash: number;
   splitFactor: number;
+  companyName: string;
   dailyChange: number;
   dailyChangePercent: number;
 }
 
+interface CompanyInfo {
+  ticker: string;
+  company: string;
+}
+
 async function getTiingoStatus() {
   const tickers = "aapl,msft,googl,amzn,nvda,tsla,meta";
+  const companyInfo: CompanyInfo[] = [
+    { ticker: "aapl", company: "Apple Inc." },
+    { ticker: "msft", company: "Microsoft Corporation" },
+    { ticker: "googl", company: "Alphabet Inc." },
+    { ticker: "amzn", company: "Amazon.com, Inc." },
+    { ticker: "nvda", company: "NVIDIA Corporation" },
+    { ticker: "tsla", company: "Tesla, Inc." },
+    { ticker: "meta", company: "Meta Platforms, Inc." }
+  ];
   const url = `https://api.tiingo.com/tiingo/daily/prices?tickers=${tickers}&token=${process.env.API_KEY}`;
   
   try {
@@ -32,15 +47,16 @@ async function getTiingoStatus() {
     const processedStocks = data.map(stock => {
       const dollarChange = stock.adjClose - stock.open;
       const percentageChange = (dollarChange / stock.open) * 100;
+      const companyName = companyInfo.find(c => c.ticker === stock.ticker)?.company || stock.ticker.toUpperCase();
       
       return {
         ...stock,
+        companyName: companyName,
         dailyChange: dollarChange,
         dailyChangePercent: percentageChange
       };
     });
 
-    console.log("Processed Stock Data:", processedStocks);
     return { success: true, stocks: processedStocks };
   } catch (err) {
     return { 
@@ -56,7 +72,7 @@ async function updateStocksToDB(stocks: StockData[]) {
     for (const stock of stocks) {
       await sql`
         INSERT INTO stocks (ticker, company_name, current_price, last_updated)
-        VALUES (${stock.ticker.toUpperCase()}, ${stock.ticker.toUpperCase()}, ${stock.adjClose}, CURRENT_TIMESTAMP)
+        VALUES (${stock.ticker.toUpperCase()}, ${stock.companyName}, ${stock.adjClose}, CURRENT_TIMESTAMP)
         ON CONFLICT (ticker)
         DO UPDATE SET
           company_name = EXCLUDED.company_name,
