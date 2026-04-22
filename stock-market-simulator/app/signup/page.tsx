@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/dist/client/link';
+import { useState } from 'react';
+
+
+
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -10,15 +13,32 @@ export default function Signup() {
     const [confirmPassword, setConfirmPassword] = useState("");
 
     const router = useRouter()
+
+    
+    async function handleSubmit (e: React.SyntheticEvent) {
+        e.preventDefault();
+        if (password !== confirmPassword) {
+            alert('Passwords do not match');
+            return;
+        }
+        const res = await fetch('/api/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        if (res.ok) {
+            router.push('/trade');
+        } else {
+            const data = await res.json();
+            alert(data.error || 'Signup failed');
+        }
+    }
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-black">
             <form
                 className="bg-white border border-gray-200 rounded-xl shadow-xl p-8 flex flex-col gap-5 w-80"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log(email, password, confirmPassword);
-                    router.push("/trade");
-                }}
+                onSubmit={handleSubmit}
             >
                 <h1 className="text-2xl font-bold text-center mb-2">Sign Up</h1>
 

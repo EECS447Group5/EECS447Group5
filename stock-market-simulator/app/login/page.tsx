@@ -2,22 +2,36 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/dist/client/link';
+import Link from 'next/link';
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const router = useRouter()
+    const router = useRouter();
+
+    async function handleSubmit (e: React.SyntheticEvent) {
+        e.preventDefault();
+        const res = await fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        if (res.ok) {
+            router.push('/trade');
+        } else {
+            alert('Login failed');
+        }
+    }
+
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-black">
             <form
                 className="bg-white border border-gray-200 rounded-xl shadow-xl p-8 flex flex-col gap-5 w-80"
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log(email, password);
-                    router.push("/trade");
-                }}
+
+                onSubmit={handleSubmit}
+                
             >
                 <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
 
