@@ -42,7 +42,7 @@ async function getTiingoStatus() {
     const url = `https://api.tiingo.com/tiingo/daily/prices?tickers=${tickers}&token=${process.env.API_KEY}`;
 
     try {
-        const res = await fetch(url, { next: { revalidate: 3600 } });
+        const res = await fetch(url, { next: { revalidate: 0 } });
         if (!res.ok) throw new Error(`Tiingo error: ${res.status}`);
 
         const data: StockData[] = await res.json();
@@ -75,7 +75,7 @@ async function updateStocksToDB(stocks: StockData[]) {
     try {
         await client.query('BEGIN');
             for (const stock of stocks) {
-                const result = await client.query(`
+                await client.query(`
                 INSERT INTO stocks (ticker, company_name, current_price, last_updated)
                 VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
                 ON CONFLICT (ticker)
@@ -84,7 +84,6 @@ async function updateStocksToDB(stocks: StockData[]) {
                     current_price = EXCLUDED.current_price,
                     last_updated = EXCLUDED.last_updated;
                 `, [stock.ticker.toUpperCase(), stock.companyName, stock.adjClose]);
-                console.log(`Updated ${stock.ticker}: ${result.rowCount} rows`);
             }
         await client.query('COMMIT');
         console.log("Stock data updated in stocks table");
