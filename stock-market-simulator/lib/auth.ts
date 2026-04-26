@@ -1,9 +1,6 @@
 // lib/auth.ts
 import { cookies } from 'next/headers';
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DB_URL })
-
+import { pool } from '@/lib/db';
 
 export async function getCurrentUser() {
     

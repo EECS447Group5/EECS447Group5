@@ -1,12 +1,8 @@
 
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { Pool } from 'pg';
+import { pool } from '@/lib/db';
 import crypto from 'crypto';
-
-const pool = new Pool ({ connectionString: process.env.DB_URL});
-
-
 
 export async function POST(request: Request) {
     //parse JSON
