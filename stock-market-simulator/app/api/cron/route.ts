@@ -76,14 +76,16 @@ async function updateStocksToDB(stocks: StockData[]) {
         await client.query('BEGIN');
             for (const stock of stocks) {
                 await client.query(`
-                INSERT INTO stocks (ticker, company_name, current_price, last_updated)
-                VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+                INSERT INTO stocks (ticker, company_name, current_price, daily_change, daily_change_percent, last_updated)
+                VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
                 ON CONFLICT (ticker)
                 DO UPDATE SET
                     company_name = EXCLUDED.company_name,
                     current_price = EXCLUDED.current_price,
+                    daily_change = EXCLUDED.daily_change,
+                    daily_change_percent = EXCLUDED.daily_change_percent,
                     last_updated = EXCLUDED.last_updated;
-                `, [stock.ticker.toUpperCase(), stock.companyName, stock.adjClose]);
+                `, [stock.ticker.toUpperCase(), stock.companyName, stock.adjClose, stock.dailyChange, stock.dailyChangePercent]);
             }
         await client.query('COMMIT');
         console.log("Stock data updated in stocks table");
