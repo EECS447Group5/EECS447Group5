@@ -4,7 +4,7 @@ interface TransactionData {
     transaction_id: number;
     user_id: number;
     ticker: string;
-    type: 'buy' | 'sell';
+    type: 'BUY' | 'SELL';
     quantity: number;
     price_at_trade: number;
     trade_date: Date;
