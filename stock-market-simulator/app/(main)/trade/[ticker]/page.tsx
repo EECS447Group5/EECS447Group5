@@ -1,13 +1,17 @@
 import Link from "next/link";
 import BuyForm from "./BuyForm";
+import SellForm from "./SellForm";
 import { getStockData } from "@/lib/stocks";
 
 export default async function StockDetailPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ ticker: string }>
+    searchParams: Promise<{ action?: string }>
 }) {
     const { ticker } = await params;
+    const { action } = await searchParams;
     const stockData = await getStockData(ticker);
     const isPositive = stockData[0].daily_change > 0;
     const isNegative = stockData[0].daily_change < 0;
@@ -41,8 +45,32 @@ export default async function StockDetailPage({
                     <h4 className={`text-2xl font-semibold mb-4 ${changeColor}`}>
                         {isPositive ? '+' : '-'}${Math.abs(stockData[0].daily_change).toFixed(2)} ({(stockData[0].daily_change_percent).toFixed(2)}%)
                     </h4>
+                    <p className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-1">
+                        Action
+                    </p>
+                    <div className="flex gap-4 mb-8">
+                        <Link
+                            href={`/trade/${ticker}?action=buy`}
+                            className={`rounded-md py-2 px-6 transition-colors ${
+                                action === 'buy' ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700'
+                            }`}
+                        >
+                            Buy
+                        </Link>
+                        <Link
+                            href={`/trade/${ticker}?action=sell`}
+                            className={`rounded-md py-2 px-6 transition-colors ${
+                                action === 'sell' ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700'
+                            }`}
+                        >
+                            Sell
+                        </Link>
+                    </div>
 
-                    <BuyForm ticker={ticker} />
+                    {action === 'buy' && <BuyForm ticker={ticker} />}
+                    {action === 'sell' && <SellForm ticker={ticker} />}
+                    
+                    {!action && <p className="text-gray-500 italic">Select an action to trade</p>}
                 </div>
             </div>
         </div>
