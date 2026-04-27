@@ -1,5 +1,6 @@
 // app/(main)/portfolio/page.tsx
 import { getCurrentUser } from '@/lib/auth';
+import { getHoldingsForUser } from '@/lib/holdings';
 import { pool } from '@/lib/db';
 
 export default async function PortfolioPage() {
@@ -11,21 +12,8 @@ export default async function PortfolioPage() {
         return <div>Not logged in</div>;
     }
     
-    const result = await pool.query(
-        `SELECT
-          s.ticker, 
-          s.company_name, 
-          s.current_price, 
-          s.daily_change_percent, 
-          h.quantity,
-          h.quantity * s.current_price AS value
-        FROM holdings h
-        JOIN stocks s ON h.stock_id = s.stock_id
-        WHERE h.user_id = $1`,
-        [user.user_id]
-    );
+    const holdings = await getHoldingsForUser(user.user_id);
     
-    const holdings = result.rows;
     
     return (
         <div>
