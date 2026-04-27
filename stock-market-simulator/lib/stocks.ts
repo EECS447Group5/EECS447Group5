@@ -28,3 +28,25 @@ export async function getMarketData() {
         throw err;
     }
 }
+
+export async function getStockData(ticker: string) {
+    try {
+        const res = await pool.query(`
+            SELECT ticker, company_name, current_price, daily_change, daily_change_percent
+            FROM stocks
+            WHERE ticker = $1
+            ORDER BY ticker ASC;
+            `, [ticker]);
+        const data: StockData[] = res.rows.map(row => ({
+            ticker: row.ticker,
+            company_name: row.company_name,
+            current_price: parseFloat(row.current_price),
+            daily_change: parseFloat(row.daily_change),
+            daily_change_percent: parseFloat(row.daily_change_percent)
+        }));
+        return data;
+    } catch (err) {
+        console.error("Error fetching stock data from DB: ", err);
+        throw err;
+    }
+}
