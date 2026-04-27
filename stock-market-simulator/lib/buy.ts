@@ -11,12 +11,12 @@ export async function buyStock(user_id: number, ticker: string, quantity: number
             RETURNING transaction_id;
         `, [user_id, ticker, quantity, price_at_trade]);
         await pool.query(`
-            INSERT INTO holdings (user_id, stock_id, quantity, price_at_trade)
-            VALUES ($1, (SELECT stock_id FROM stocks WHERE ticker = $2), $3, $4)
+            INSERT INTO holdings (user_id, stock_id, quantity)
+            VALUES ($1, (SELECT stock_id FROM stocks WHERE ticker = $2), $3)
             ON CONFLICT (user_id, stock_id)
             DO UPDATE SET
                 quantity = holdings.quantity + EXCLUDED.quantity
-                `, [user_id, ticker, quantity, price_at_trade]);
+                `, [user_id, ticker, quantity]);
         await pool.query(`
             UPDATE users
             SET balance = balance - $1
