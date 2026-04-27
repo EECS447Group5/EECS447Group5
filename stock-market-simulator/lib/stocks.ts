@@ -24,7 +24,7 @@ export async function getMarketData() {
         }));
         return data;
     } catch (err) {
-        console.error("Error fetching stock data from DB: ", err);
+        console.error("Error fetching market data from DB: ", err);
         throw err;
     }
 }
@@ -34,8 +34,7 @@ export async function getStockData(ticker: string) {
         const res = await pool.query(`
             SELECT ticker, company_name, current_price, daily_change, daily_change_percent
             FROM stocks
-            WHERE ticker = $1
-            ORDER BY ticker ASC;
+            WHERE ticker = $1;
             `, [ticker]);
         const data: StockData[] = res.rows.map(row => ({
             ticker: row.ticker,
