@@ -1,10 +1,13 @@
 'use client'
 import { useState } from 'react'
+import { UserData } from '@/lib/users';
+import { buyStock } from '@/lib/buy';
 
-export default function BuyForm({ ticker, balance, price }: { ticker: string; balance: number; price: number }) {
+export default function BuyForm({ ticker, user, price }: { ticker: string; user: UserData; price: number }) {
     const [quantity, setQuantity] = useState(1);
     const [message, setMessage] = useState("");
-    const max = Math.floor(balance / price);
+    
+    const max = Math.floor(user.balance / price);
     const min = max < 1 ? 0 : 1;
     if (quantity > max) {
         setQuantity(max);
@@ -19,11 +22,16 @@ export default function BuyForm({ ticker, balance, price }: { ticker: string; ba
                         setMessage("Quantity must be at least 1");
                         return;
                     }
-                    else if (quantity * price > balance) {
+                    else if (quantity * price > user.balance) {
                         setMessage("Insufficient balance");
                         return;
                     };
-                    setMessage(`Bought ${quantity} share(s) of ${ticker}`);
+                    try {
+                        buyStock(user.user_id, ticker, quantity, price);
+                        setMessage(`Bought ${quantity} share(s) of ${ticker}`);
+                    } catch (error) {
+                        setMessage(`Error occurred while attempting to buy ${quantity} share(s) of ${ticker}`);
+                    }
                 }}
                 className="flex flex-col gap-4"
             >
@@ -40,13 +48,13 @@ export default function BuyForm({ ticker, balance, price }: { ticker: string; ba
                     className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-32"
                 />
                 <p className="text-sm text-gray-500">
-                    Available Balance: ${balance.toFixed(2)}
+                    Available Balance: ${user.balance.toFixed(2)}
                 </p>
                 <p className="text-sm text-gray-500">
                     Cost: ${(quantity * price).toFixed(2)}
                 </p>
                 <p className="text-sm text-gray-500">
-                    Remaining Balance: ${(balance - quantity * price).toFixed(2)}
+                    Remaining Balance: ${(user.balance - quantity * price).toFixed(2)}
                 </p>
                 <button
                     type="submit"
