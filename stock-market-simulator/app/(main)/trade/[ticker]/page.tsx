@@ -39,7 +39,7 @@ export default async function StockDetailPage({
                         Today's Gain/Loss
                     </p>
                     <h4 className={`text-2xl font-semibold mb-4 ${changeColor}`}>
-                        {isPositive ? '+' : ''}{stockData[0].daily_change.toFixed(2)} ({stockData[0].daily_change_percent.toFixed(2)}%)
+                        {isPositive ? '+' : '-'}${Math.abs(stockData[0].daily_change).toFixed(2)} ({(stockData[0].daily_change_percent).toFixed(2)}%)
                     </h4>
 
                     <BuyForm ticker={ticker} />
