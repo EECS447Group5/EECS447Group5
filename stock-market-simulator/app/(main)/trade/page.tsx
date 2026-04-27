@@ -32,7 +32,7 @@ export default async function TradePage() {
                                             ${stock.current_price.toFixed(2)}
                                         </div>
                                         <div className={`text-sm font-medium ${changeColor}`}>
-                                            {stock.daily_change.toFixed(2)} ({stock.daily_change_percent.toFixed(2)}%)
+                                            {isPositive ? '+' : ''}{stock.daily_change.toFixed(2)} ({stock.daily_change_percent.toFixed(2)}%)
                                         </div>
                                     </div>
                                 </Link>
