@@ -11,14 +11,17 @@ export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const router = useRouter()
 
     
     async function handleSubmit (e: React.SyntheticEvent) {
         e.preventDefault();
+        setLoading(true);
         if (password !== confirmPassword) {
             alert('Passwords do not match');
+            setLoading(false);
             return;
         }
         const res = await fetch('/api/signup', {
@@ -31,6 +34,7 @@ export default function Signup() {
         } else {
             const data = await res.json();
             alert(data.error || 'Signup failed');
+            setLoading(false);
         }
     }
 
@@ -54,6 +58,7 @@ export default function Signup() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         placeholder="your@email.com"
+                        disabled={loading}
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
@@ -70,6 +75,7 @@ export default function Signup() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         placeholder="Create a strong password"
+                        disabled={loading}
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                     <small className="form-hint text-gray-500">
@@ -89,15 +95,17 @@ export default function Signup() {
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
                         placeholder="Confirm your password"
+                        disabled={loading}
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
 
                 <button
                     type="submit"
+                    disabled={loading}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md py-2 mt-2 transition-colors"
                 >
-                    Sign Up
+                    {loading ? 'Signing up...' : 'Sign Up'}
                 </button>
             </form>
 

@@ -7,11 +7,13 @@ import Link from 'next/link';
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const router = useRouter();
 
     async function handleSubmit (e: React.SyntheticEvent) {
         e.preventDefault();
+        setLoading(true);
         const res = await fetch('/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -21,6 +23,7 @@ export default function Login() {
             router.push('/trade');
         } else {
             alert('Login failed');
+            setLoading(false);
         }
     }
 
@@ -31,7 +34,6 @@ export default function Login() {
                 className="bg-white border border-gray-200 rounded-xl shadow-xl p-8 flex flex-col gap-5 w-80"
 
                 onSubmit={handleSubmit}
-                
             >
                 <h1 className="text-2xl font-bold text-center mb-2">Log In</h1>
 
@@ -47,6 +49,7 @@ export default function Login() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                         placeholder="your@email.com"
+                        disabled={loading}
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
@@ -63,15 +66,17 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         placeholder="Enter your password"
+                        disabled={loading}
                         className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
                 </div>
 
                 <button
                     type="submit"
+                    disabled={loading}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md py-2 mt-2 transition-colors"
                 >
-                    Log In
+                    {loading ? 'Logging in...' : 'Log In'}
                 </button>
             </form>
 
