@@ -1,8 +1,6 @@
 // app/(main)/portfolio/page.tsx
 import { getCurrentUser } from '@/lib/auth';
-import { Pool } from 'pg';
-
-const pool = new Pool({ connectionString: process.env.DB_URL });
+import { pool } from '@/lib/db';
 
 export default async function PortfolioPage() {
     const user = await getCurrentUser();
