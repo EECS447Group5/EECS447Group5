@@ -18,7 +18,7 @@ export async function getMarketData() {
         const data: StockData[] = res.rows.map(row => ({
             ticker: row.ticker,
             company_name: row.company_name,
-            current_price: row.current_price,
+            current_price: parseFloat(row.current_price),
             daily_change: parseFloat(row.daily_change),
             daily_change_percent: parseFloat(row.daily_change_percent)
         }));
