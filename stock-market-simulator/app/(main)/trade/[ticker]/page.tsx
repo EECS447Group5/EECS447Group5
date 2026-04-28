@@ -3,6 +3,7 @@ import BuyForm from "./BuyForm";
 import SellForm from "./SellForm";
 import { getStockData } from "@/lib/stocks";
 import { getUserData } from "@/lib/users";
+import { getHoldingQuantity } from "@/lib/holdings";
 
 export default async function StockDetailPage({
     params,
@@ -15,6 +16,7 @@ export default async function StockDetailPage({
     const { action } = await searchParams;
     const stockData = await getStockData(ticker);
     const user = await getUserData();
+    const quantity_owned = await getHoldingQuantity(user.user_id, ticker);
     const isPositive = stockData[0].daily_change > 0;
     const isNegative = stockData[0].daily_change < 0;
     const changeColor = isPositive ? "text-green-600" : isNegative ? "text-red-600" : "text-gray-900";
@@ -70,7 +72,7 @@ export default async function StockDetailPage({
                     </div>
 
                     {action === 'buy' && <BuyForm ticker={ticker} user={user} price={stockData[0].current_price} />}
-                    {action === 'sell' && <SellForm ticker={ticker} />}
+                    {action === 'sell' && <SellForm ticker={ticker} user={user} price={stockData[0].current_price} quantity_owned={quantity_owned}/>}
                     
                     {!action && <p className="text-gray-500 italic">Select an action to trade</p>}
                 </div>
