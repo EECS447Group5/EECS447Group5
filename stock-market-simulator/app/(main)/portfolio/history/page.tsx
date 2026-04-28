@@ -13,7 +13,6 @@ export default async function HistoryPage() {
     return (
         <div className="min-h-screen bg-gray-100 text-black py-10 px-4">
             <div className="max-w-4xl mx-auto">
-                <h1 className="text-3xl font-bold mb-6">Transaction History</h1>
 
                 {history.length === 0 ? (
                     <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center text-gray-500">

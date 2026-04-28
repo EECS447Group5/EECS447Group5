@@ -17,7 +17,7 @@ export async function getCurrentUser() {
     //look up the session joined to the user.
 
     const result = await pool.query(
-        `SELECT users.user_id, users.email
+        `SELECT users.user_id, users.email, users.balance
         FROM sessions
         JOIN users on sessions.user_id = users.user_id 
         WHERE sessions.id = $1 AND expires_at > NOW()`, [token]);
