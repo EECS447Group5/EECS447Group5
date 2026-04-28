@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stock Market Simulator",
+  title: "Stock Sim",
   description: "Gain experience in the stock market without risking real money",
 };
 
