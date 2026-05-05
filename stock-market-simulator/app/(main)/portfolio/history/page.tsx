@@ -1,11 +1,21 @@
 // app/(main)/portfolio/history/page.tsx
+import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { getHistoryForUser } from '@/lib/history';
 
 export default async function HistoryPage() {
     const user = await getCurrentUser();
     if (!user) {
-        return <div>Not logged in</div>;
+        return (
+            <div className="min-h-screen bg-gray-100 text-black py-10 px-4">
+                <div className="max-w-md mx-auto bg-white border border-gray-200 rounded-xl shadow-sm p-8 text-center">
+                    <p className="text-gray-700 mb-4">Log in to view your transaction history.</p>
+                    <Link href="/login" className="text-blue-700 font-medium hover:underline">
+                        Go to login →
+                    </Link>
+                </div>
+            </div>
+        );
     }
 
     const history = await getHistoryForUser(user.user_id);
