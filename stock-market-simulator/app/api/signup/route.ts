@@ -70,12 +70,12 @@ export async function POST(request: Request) {
 
 
 
-    } catch (err: any) {
+    } catch (err) {
         await client.query('ROLLBACK');
-        if (err.code === '23505') {
+        if (err instanceof Error && (err as { code?: string }).code === '23505') {
             return NextResponse.json({ error: 'Email already in use' }, { status: 409});
         }
-           
+
         throw err;
     } finally {
         client.release();
